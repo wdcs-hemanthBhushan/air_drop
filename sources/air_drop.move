@@ -19,7 +19,7 @@
         const ERROR_INVALID_OWNER: u64 = 2;
 
         struct ClaimAirdropEvent has store, drop {
-              id: TokenId,
+              id: u8,
               auction_id: u64,
               timestamp: u64,
               bidder_address: address
@@ -30,7 +30,7 @@
              timestamp:u64
          }    
 
-        struct AirDrop has key ,store {
+        struct AirDrop has key ,store,drop  {
               level:u8,
               name:String,
               account:address,
@@ -38,7 +38,7 @@
               selected_event: EventHandle<EligibleForDropEvent>
          }
 
-        struct StoreAirDropUsers has key {
+        struct StoreAirDropUsers has key,drop {
               list_of_users : vector<AirDrop>
          }
 
@@ -49,10 +49,10 @@
             let (market_signer , market_cap) = account::create_resource_account(sender,b"oe");
             let market_signer_addr = signer::address_of(&market_signer);
 
-            assert!(sender == @my_addrx,ERROR_INVALID_OWNER);
+            assert!(sender_addr == @my_addrx,ERROR_INVALID_OWNER);
 
             if(!exists<StoreAirDropUsers>(market_signer_addr)){
-                move_to(market_signer, StoreAirDropUsers{
+                move_to(&market_signer, StoreAirDropUsers{
                     list_of_users:vector::empty<AirDrop>()
                 })
             };
@@ -60,13 +60,13 @@
         }  
 
 
-        public fun make_user_eligible_for_airdrop(accoutn:&signer, air_drop:AirDrop, store_air_drop:StoreAirDropUsers ) {
+        public fun make_user_eligible_for_airdrop(account: &signer, air_drop:AirDrop, store_air_drop:StoreAirDropUsers ) {
             
              let account_addr : address = signer::address_of(account);
              assert!(account_addr != @my_addrx , ERROR_INVALID_BUYER);
             //  assert!(exists<StoreAirDropUsers>())
 
-              move_to(account , air_drop );
+              move_to(account , air_drop )
 
        }  
 
